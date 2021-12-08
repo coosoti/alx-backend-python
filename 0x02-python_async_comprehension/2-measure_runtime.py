@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This module contains a coroutine that will execute async_comprehesion four
  times in parallel using asyncio.gather. measure_runtime returns the total
