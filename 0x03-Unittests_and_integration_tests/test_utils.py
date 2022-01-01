@@ -2,9 +2,11 @@
 """
 This module contains a python unit test for utils
 """
+import requests
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map
+from unittest.mock import patch
+from utils import access_nested_map, get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -44,6 +46,6 @@ class TestGetJson(unittest.TestCase):
     ])
     def test_get_json(self, url, payload):
         """this function test the get_json() method"""
-        with path('requests.get') as mock_req:
+        with patch('requests.get') as mock_req:
             mock_req.return_value.json.return_value = payload
             self.assertEqual(get_json(url), payload)
