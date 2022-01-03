@@ -5,7 +5,8 @@ this module contains unittests for client
 import unittest
 from unittest.mock import PropertyMock, patch
 from client import GithubOrgClient
-from parameterized import param, parameterized
+from parameterized import param, parameterized, parameterized_class
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -66,3 +67,36 @@ class TestGithubOrgClient(unittest.TestCase):
         """
         has_key_bool = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(has_key_bool, expected)
+
+@parameterized_class(
+    ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
+    TEST_PAYLOAD
+)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """
+    Testing integration
+    """
+    @classmethod
+    def setUpClass(cls):
+        """set up class before each method"""
+        config = {'return_value.json.side_effect':
+                  [
+                    cls.org_payload, cls.repos_payload,
+                    cls.org_payload, cls.repos_payload
+                  ]
+                  }
+        cls.get_patcher = patch('requests.get', **config)
+        cls.mock = cls.get_patcher.start()
+
+    def test_public_repos(self):
+        """this method tests public repos with and without license"""
+        testCls = GithubOrgClient('google')
+        self.assertEqual(testCls.org, self.org_payload)
+        self.assertEqual(testCls.repos_payload, self.repos_payload)
+        self.assertEqual(testCls.public_repos(), self.expected_repos)
+        self.mock.assert_called()
+
+    @classmethod
+    def tearDownClass(cls):
+        """tear down after each class"""
+        cls.get_patcher.stop()
