@@ -68,6 +68,7 @@ class TestGithubOrgClient(unittest.TestCase):
         has_key_bool = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(has_key_bool, expected)
 
+
 @parameterized_class(
     ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
     TEST_PAYLOAD
